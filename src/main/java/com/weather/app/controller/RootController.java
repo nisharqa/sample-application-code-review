@@ -13,6 +13,15 @@ import java.util.Map;
 @Hidden
 public class RootController {
 
+    /**
+     * Provides a discovery payload describing the application and its available routes.
+     *
+     * @return a Map containing:
+     *         - "application": application name,
+     *         - "version": application version,
+     *         - "status": application status,
+     *         - "endpoints": a nested Map that maps endpoint labels (e.g., "Swagger UI", "Cities API") to their URL paths
+     */
     @GetMapping("/")
     public ResponseEntity<Map<String, Object>> root() {
         Map<String, Object> response = new HashMap<>();
@@ -30,6 +39,17 @@ public class RootController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Provide a 404 Not Found response body listing error details and available endpoints.
+     *
+     * The response body is a map with keys:
+     * - "error": short error title
+     * - "message": human-readable explanation
+     * - "statusCode": HTTP status code (404)
+     * - "availableEndpoints": a map of named routes (Swagger UI, OpenAPI JSON, Cities API, Weather API, Health)
+     *
+     * @return a ResponseEntity with HTTP 404 and a body map containing error details and available endpoints
+     */
     @GetMapping("/error")
     public ResponseEntity<Map<String, Object>> error() {
         Map<String, Object> response = new HashMap<>();

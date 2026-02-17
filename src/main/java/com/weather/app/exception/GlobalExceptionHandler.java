@@ -14,6 +14,15 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Produce a 404 Not Found response describing the missing resource and listing common application endpoints.
+     *
+     * @param ex the NoHandlerFoundException containing the original request URL
+     * @return a ResponseEntity whose body is a Map with keys:
+     *         "timestamp" (LocalDateTime), "status" (int 404), "error" (String "Not Found"),
+     *         "message" (String describing the missing resource), "path" (requested URL),
+     *         and "availableEndpoints" (Map<String,String> of common application URLs)
+     */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, Object>> handleNoHandlerFound(NoHandlerFoundException ex) {
@@ -35,6 +44,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
+    /**
+     * Handle uncaught exceptions and produce a standardized HTTP 500 error response.
+     *
+     * The response body is a Map containing `timestamp`, `status`, `error`, and `message`.
+     *
+     * @param ex the exception that was thrown
+     * @return a ResponseEntity whose body is a map with keys:
+     *         - "timestamp": the time the error was handled
+     *         - "status": 500
+     *         - "error": "Internal Server Error"
+     *         - "message": the exception's message
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {

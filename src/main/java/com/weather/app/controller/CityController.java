@@ -27,8 +27,9 @@ public class CityController {
     private CityService cityService;
 
     /**
-     * Get all cities
-     * GET /api/cities
+     * Retrieve all cities.
+     *
+     * @return the list of all City objects
      */
     @GetMapping
     @Operation(summary = "Get all cities", description = "Retrieve a list of all available cities")
@@ -40,8 +41,10 @@ public class CityController {
     }
 
     /**
-     * Get a city by ID
-     * GET /api/cities/{id}
+     * Retrieve a city by its identifier.
+     *
+     * @param id the city's identifier
+     * @return a ResponseEntity containing the found City with HTTP 200, or an empty response with HTTP 404 if not found
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get city by ID", description = "Retrieve a specific city by its ID")
@@ -57,8 +60,10 @@ public class CityController {
     }
 
     /**
-     * Get a city by name
-     * GET /api/cities/search?name=New York
+     * Finds a city by its name.
+     *
+     * @param name the city name to search for
+     * @return a ResponseEntity containing the City when found, or an empty response with HTTP 404 status when not found
      */
     @GetMapping("/search")
     @Operation(summary = "Search city by name", description = "Find a city by its name")
@@ -74,8 +79,10 @@ public class CityController {
     }
 
     /**
-     * Create a new city
-     * POST /api/cities
+     * Create a new city and return the created resource.
+     *
+     * @param city the city details to create
+     * @return a ResponseEntity containing the created City and HTTP 201 Created status
      */
     @PostMapping
     @Operation(summary = "Create a new city", description = "Add a new city to the system")

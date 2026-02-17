@@ -27,8 +27,9 @@ public class WeatherController {
     private WeatherService weatherService;
 
     /**
-     * Get all weather data
-     * GET /api/weather
+     * Retrieve weather information for all cities.
+     *
+     * @return a ResponseEntity containing a list of Weather objects with HTTP status 200
      */
     @GetMapping
     @Operation(summary = "Get all weather data", description = "Retrieve weather information for all cities")
@@ -40,8 +41,10 @@ public class WeatherController {
     }
 
     /**
-     * Get weather for a specific city by city ID
-     * GET /api/weather/city/{cityId}
+     * Retrieve weather information for a city identified by its ID.
+     *
+     * @param cityId the ID of the city to retrieve weather for
+     * @return 200 with the Weather when found, 404 when no weather data exists for the given city ID
      */
     @GetMapping("/city/{cityId}")
     @Operation(summary = "Get weather by city ID", description = "Retrieve weather information for a specific city by ID")
@@ -57,8 +60,10 @@ public class WeatherController {
     }
 
     /**
-     * Get weather for a specific city by city name
-     * GET /api/weather/search?cityName=New York
+     * Retrieve weather information for a city by name.
+     *
+     * @param cityName the city name to search for
+     * @return a ResponseEntity containing the city's Weather with HTTP 200 when found, or HTTP 404 when not found
      */
     @GetMapping("/search")
     @Operation(summary = "Search weather by city name", description = "Find weather information by city name")
@@ -74,8 +79,11 @@ public class WeatherController {
     }
 
     /**
-     * Update weather for a city
-     * PUT /api/weather/city/{cityId}
+     * Update the stored weather for the specified city.
+     *
+     * @param cityId the ID of the city whose weather should be updated
+     * @param weather the updated weather data to persist for the city
+     * @return ResponseEntity containing the updated Weather with HTTP status 200 if the city exists; HTTP status 404 with an empty body if the city is not found
      */
     @PutMapping("/city/{cityId}")
     @Operation(summary = "Update weather for a city", description = "Update weather information for a specific city")
@@ -92,8 +100,10 @@ public class WeatherController {
     }
 
     /**
-     * Create new weather data for a city
-     * POST /api/weather
+     * Create weather information for a city.
+     *
+     * @param weather the weather details to persist
+     * @return the persisted Weather object including any generated fields
      */
     @PostMapping
     @Operation(summary = "Create new weather data", description = "Add weather information for a city")

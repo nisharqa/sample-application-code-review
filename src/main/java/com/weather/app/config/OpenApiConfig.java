@@ -10,6 +10,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
+    /**
+     * Create and configure the OpenAPI specification for the Weather Service API.
+     *
+     * The returned OpenAPI instance is populated with API metadata including the
+     * title, version, description, contact information, and license.
+     *
+     * @return an OpenAPI instance containing the API metadata (title, version, description, contact, license)
+     */
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
