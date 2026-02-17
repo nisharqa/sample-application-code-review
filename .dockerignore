@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+README.md
+.DS_Store
+*.log
+.env
+.vscode/
+.idea/
+*.iml
+node_modules/
+*.swp
+*.swo
