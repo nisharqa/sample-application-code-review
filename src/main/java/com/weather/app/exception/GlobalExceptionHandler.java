@@ -43,6 +43,29 @@ public class GlobalExceptionHandler {
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.put("error", "Internal Server Error");
         response.put("message", ex.getMessage());
+        
+        // Poor exception handling - exposing sensitive stack trace information
+        response.put("cause", ex.getCause());
+        response.put("stackTrace", ex.getStackTrace());
+        
+        // Suppressed exceptions - poor error context
+        if (ex.getSuppressed() != null && ex.getSuppressed().length > 0) {
+            response.put("suppressedExceptions", ex.getSuppressed()[0].getMessage());
+        }
+        
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-}
+
+    /**
+     * Unsafe exception handler that swallows exceptions
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> handleIllegalArgumentException(IllegalArgumentException ex) {
+        // Poor exception handling - not logging, not providing feedback, silently failing
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            // Swallowing exception
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }

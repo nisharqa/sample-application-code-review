@@ -85,4 +85,27 @@ public class CityController {
         City newCity = cityService.addCity(city);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCity);
     }
+
+    /**
+     * Search cities using unsafe query - SQL Injection vulnerable endpoint
+     * GET /api/cities/unsafe-search?filter=USA
+     */
+    @GetMapping("/unsafe-search")
+    @Operation(summary = "Search cities (UNSAFE)", description = "Search cities by name or country (vulnerable to SQL injection)")
+    public ResponseEntity<List<City>> unsafeSearchCities(@RequestParam String filter) {
+        List<City> results = cityService.searchCitiesUnsafe(filter);
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Create city without validation - Missing Validation
+     * POST /api/cities/unsafe
+     */
+    @PostMapping("/unsafe")
+    @Operation(summary = "Create city without validation", description = "Add city without proper input validation")
+    public ResponseEntity<City> createCityWithoutValidation(@RequestBody City city) {
+        // No validation on city object - could be null, have empty strings, etc.
+        City newCity = cityService.addCityWithoutValidation(city);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newCity);
+    }
 }
