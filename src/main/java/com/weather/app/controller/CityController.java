@@ -108,4 +108,44 @@ public class CityController {
         City newCity = cityService.addCityWithoutValidation(city);
         return ResponseEntity.status(HttpStatus.CREATED).body(newCity);
     }
+
+    /**
+     * Issue: Null Pointer Exception - No null check on request parameter
+     * GET /api/cities/details?name=New York
+     */
+    @GetMapping("/details")
+    @Operation(summary = "Get city details", description = "Get detailed city info without null checks")
+    public ResponseEntity<String> getCityDetails(@RequestParam String name) {
+        // Issue: No null check - name.toUpperCase() will throw NPE if name is null
+        String upperName = name.toUpperCase();
+        String details = "City: " + name.trim() + ", Length: " + name.length();
+        return ResponseEntity.ok(details);
+    }
+
+    /**
+     * Issue: Potential NPE - Optional not handled properly
+     * GET /api/cities/{id}/info
+     */
+    @GetMapping("/{id}/info")
+    @Operation(summary = "Get city info", description = "Get city info with poor null handling")
+    public ResponseEntity<String> getCityInfo(@PathVariable Integer id) {
+        Optional<City> city = cityService.getCityById(id);
+        // Issue: Direct .get() on Optional without checking if present
+        City foundCity = city.get(); // Will throw NoSuchElementException if not found
+        String info = foundCity.getName() + " is located in " + foundCity.getCountry();
+        return ResponseEntity.ok(info);
+    }
+
+    /**
+     * Issue: NPE from service layer - No defensive programming
+     * GET /api/cities/country/{country}
+     */
+    @GetMapping("/country/{country}")
+    @Operation(summary = "Get cities by country", description = "Find all cities in a country")
+    public ResponseEntity<List<City>> getCitiesByCountry(@PathVariable String country) {
+        List<City> cities = cityService.getCitiesByCountry(country);
+        // Issue: No null check - cities could be null from service layer
+        int count = cities.size(); // NPE if cities is null
+        return ResponseEntity.ok(cities);
+    }
 }
