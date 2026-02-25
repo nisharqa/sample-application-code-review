@@ -125,4 +125,73 @@ public class WeatherController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
         }
     }
+
+    /**
+     * Issue: Resource Leak - FileInputStream not closed properly
+     * GET /api/weather/export
+     */
+    @GetMapping("/export")
+    @Operation(summary = "Export weather data", description = "Export weather data to file")
+    public ResponseEntity<String> exportWeatherData() {
+        try {
+            java.io.FileWriter writer = new java.io.FileWriter("weather-export.csv");
+            // Issue: FileWriter opened but never closed - resource leak
+            writer.write("id,city,temperature,humidity\n");
+            for (Weather w : weatherService.getAllWeather()) {
+                writer.write(w.getId() + "," + w.getCityName() + "," + w.getTemperature() + "," + w.getHumidity() + "\n");
+            }
+            // Missing: writer.close() or try-with-resources
+            return ResponseEntity.ok("Data exported successfully");
+        } catch (java.io.IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Export failed");
+        }
+    }
+
+    /**
+     * Issue: Connection not closed - JDBC resource leak
+     * GET /api/weather/backup
+     */
+    @GetMapping("/backup")
+    @Operation(summary = "Backup weather data", description = "Backup weather data to database")
+    public ResponseEntity<String> backupWeatherData() {
+        try {
+            // Issue: Connection and Statement not closed properly
+            java.sql.Connection conn = java.sql.DriverManager.getConnection(
+                "jdbc:h2:mem:testdb", "sa", DATABASE_PASSWORD);
+            java.sql.Statement stmt = conn.createStatement();
+            
+            for (Weather w : weatherService.getAllWeather()) {
+                String sql = "INSERT INTO weather_backup VALUES (" + w.getId() + ", '" + w.getCityName() + "')";
+                stmt.execute(sql);
+            }
+            // Missing: stmt.close() and conn.close()
+            return ResponseEntity.ok("Backup completed");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Backup failed");
+        }
+    }
+
+    /**
+     * Issue: Stream not closed - BufferedReader leak
+     * GET /api/weather/import
+     */
+    @GetMapping("/import")
+    @Operation(summary = "Import weather data", description = "Import weather data from file")
+    public ResponseEntity<String> importWeatherData() {
+        try {
+            java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.FileReader("weather-data.txt"));
+            // Issue: Reader opened but never closed
+            String line;
+            int count = 0;
+            while ((line = reader.readLine()) != null) {
+                // Process line
+                count++;
+            }
+            // Missing: reader.close()
+            return ResponseEntity.ok("Imported " + count + " records");
+        } catch (java.io.IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Import failed");
+        }
+    }
 }
