@@ -74,4 +74,22 @@ public class WeatherService {
         weatherData.add(weather);
         return weather;
     }
+
+    /**
+     * N+1 Query Problem: Fetches all cities then queries weather separately for each
+     * This simulates fetching parent entities and then querying child entities in a loop
+     */
+    public List<Weather> getAllWeatherWithCityDetails(CityService cityService) {
+        List<Weather> result = new ArrayList<>();
+        // First query: get all cities (N)
+        List<com.weather.app.model.City> allCities = cityService.getAllCities();
+        // N+1: For each city, perform a separate query
+        for (com.weather.app.model.City city : allCities) {
+            Optional<Weather> weather = weatherData.stream()
+                    .filter(w -> w.getCityId().equals(city.getId()))
+                    .findFirst();
+            weather.ifPresent(result::add);
+        }
+        return result;
+    }
 }

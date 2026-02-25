@@ -57,4 +57,29 @@ public class CityService {
         cities.add(city);
         return city;
     }
+
+    /**
+     * SQL Injection vulnerability - VULNERABLE: Native query with string concatenation
+     */
+    public List<City> searchCitiesUnsafe(String filter) {
+        // Simulating vulnerable SQL query construction
+        String query = "SELECT * FROM cities WHERE name = '" + filter + "' OR country LIKE '%" + filter + "%'";
+        System.out.println("Executing query: " + query);
+        return cities.stream()
+                .filter(c -> c.getName().contains(filter) || c.getCountry().contains(filter))
+                .toList();
+    }
+
+    /**
+     * Missing validation - accepts any input without checks
+     */
+    public City addCityWithoutValidation(City city) {
+        int nextId = cities.stream()
+                .map(City::getId)
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
+        city.setId(nextId);
+        cities.add(city);
+        return city;
+    }
 }
